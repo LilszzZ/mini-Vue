@@ -10,15 +10,18 @@ class Observe {
     }
 }
 export function defineReactive(target, key, value) {
-    Object.defineProperties(target, key, {
+    observe(value)//observe(value)时会判断value是不是对象。如果不是对象的话则直接返回，是对象的话走Observe继续劫持
+    Object.defineProperty(target, key, {
         get() {
             //取值的时候执行get
+            console.log('查看')
             return value
         },
         set(newValue) {
             //修改的时候执行set方法
             if (newValue == value) return
             value = newValue
+            console.log(value, '改')
         }
     })
 }
@@ -30,5 +33,4 @@ export function observe(data) {
     }
     //如果一个对象被劫持过了，那就不需要再被劫持了。(要判断一个对象是否被劫持给,可以增添一个实例。用来判断是否被劫持过)
     return new Observe(data)
-
 }
