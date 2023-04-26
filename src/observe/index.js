@@ -1,14 +1,34 @@
 class Observe {
     constructor(data) {
         //Object.defineProperty只能劫持已经存在的属性(Vue因此单独写了一些api $set $delete)
-        this.walk(data)
+
+        if (Array.isArray(data)) {
+            //重写会修改数组的方法
+            data.__proto__ = {
+                push() {
+                    console.log('重写push')
+                }
+            }
+
+
+            this.observeArray(data)
+        } else {
+            this.walk(data)
+        }
+
     }
     walk(data) { //循环对象，对属性依次劫持
         Object.keys(data).forEach(key =>
             defineReactive(data, key, data[key])
         )
     }
+    observeArray(data) {
+        data.forEach(item => {
+            observe(item)
+        })
+    }
 }
+
 export function defineReactive(target, key, value) {
     observe(value)//observe(value)时会判断value是不是对象。如果不是对象的话则直接返回，是对象的话走Observe继续劫持
     Object.defineProperty(target, key, {
@@ -26,7 +46,6 @@ export function defineReactive(target, key, value) {
     })
 }
 export function observe(data) {
-    console.log(data)
     //对这个对象进行劫持
     if (typeof data !== 'object' || data == null) {
         return
