@@ -32,7 +32,11 @@ class Observe {
 export function defineReactive(target, key, value) {
     observe(value)//observe(value)时会判断value是不是对象。如果不是对象的话则直接返回，是对象的话走Observe继续劫持
     Object.defineProperty(target, key, {
+        let dep = new Dep //每一个属性都有一个Dep
         get() {
+            if (Dep.target) {
+                dep.depend() //让这个属性记住当前这个watcher,将wathcer收集起来
+            }
             //取值的时候执行get
             console.log('查看')
             return value
@@ -40,8 +44,10 @@ export function defineReactive(target, key, value) {
         set(newValue) {
             //修改的时候执行set方法
             if (newValue == value) return
+            observe(newValue)
             value = newValue
             console.log(value, '改')
+            dep.notify() //通知视图更新
         }
     })
 }

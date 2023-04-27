@@ -1,3 +1,4 @@
+import Watcher from './observe/watcher.js'
 import { createElementVNode, createTextVNode } from './vdom/index.js'
 function createElm(vnode) {
     let { tag, data, children, text } = vnode
@@ -67,9 +68,15 @@ export function initLifeCycle(Vue) {
 
 export function mountComponent(vm, el) {
     //1调用render方法 生成虚拟DOM
-    vm._update(vm._render());//vm.$options.render()
-
+    const updateComponent = () => {
+        vm._update(vm._render)
+    }
+    new Watcher(vm, updateComponent, true)//true用于标识是一个渲染watcher
     //2根据虚拟DOM产生真实DOM
+
+
+
+
 }
 //Vue的核心流程：创建响应式数据，把模板转为AST语法树，将AST语法树转为render函数生成虚拟DOM。后续每次更新只执行render函数(无需再次执行ast转化的过程)
 //render函数会产生虚拟节点(使用数据响应式)
